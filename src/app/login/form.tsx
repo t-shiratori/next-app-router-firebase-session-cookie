@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { emailSignIn } from '../../utils'
+import { emailSignIn } from '../../utils/auth'
 import { useRouter } from 'next/navigation'
 
 export const LoginForm = () => {
