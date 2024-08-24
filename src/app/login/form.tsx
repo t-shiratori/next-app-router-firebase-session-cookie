@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { emailSignIn } from '../../utils/auth'
+import { emailSignIn } from '../../utils/auth/clientSdk'
 import { useRouter } from 'next/navigation'
+import { fetcher } from '@/utils/apiClient'
+import { sessionLogin } from '@/utils/actions/sessionLogin'
 
 export const LoginForm = () => {
 	const router = useRouter()
@@ -13,7 +15,20 @@ export const LoginForm = () => {
 		if (emailState == '') return
 		if (passwordState == '') return
 
-		const result = await emailSignIn(emailState, passwordState)
+		const result = await emailSignIn({
+			email: emailState,
+			password: passwordState,
+			handleAfterSignIn: async (idToken) => {
+				//router.push('/')
+
+				const result = await sessionLogin(idToken)
+				console.log('sessionLogin result: ', result)
+
+				/** For api route execution */
+				// const res = await fetcher({ url: 'http://localhost:3000/api/session-login', method: 'GET', idToken })
+				// console.log('sessionLogin result: ', res)
+			},
+		})
 		console.log({ result })
 		router.push('/')
 	}

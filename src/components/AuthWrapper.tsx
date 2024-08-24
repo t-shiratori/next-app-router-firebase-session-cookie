@@ -1,7 +1,7 @@
 'use client'
 
 import { authToken } from '@/globalState'
-import { auth } from '@/utils'
+import { auth } from '@/utils/auth'
 import { useAtom, useSetAtom } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
