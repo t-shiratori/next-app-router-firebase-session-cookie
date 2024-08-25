@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { sessionLogin } from '@/utils/actions/sessionLogin'
+import { sessionLogin } from '@/serverActions/sessionLogin'
 import { emailAndPasswordSignIn } from '@/utils/auth/emailAndPasswordSignIn'
 
 export const LoginForm = () => {
