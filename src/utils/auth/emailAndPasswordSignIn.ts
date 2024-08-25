@@ -4,13 +4,12 @@ import { clientAuth } from './clientSdk'
 type emailSignInArgs = {
 	email: string
 	password: string
-	onGetIdToken: (idToken: string) => void
 }
 
 /**
  * Firebase authentication. SinIn（email, password）
  */
-export const emailAndPasswordSignIn = async ({ email, password, onGetIdToken }: emailSignInArgs) => {
+export const emailAndPasswordSignIn = async ({ email, password }: emailSignInArgs) => {
 	const userCredential = await signInWithEmailAndPassword(clientAuth, email, password).catch((error) => {
 		console.log('signInWithEmailAndPassword error:', error)
 		throw new Error(error)
@@ -24,10 +23,9 @@ export const emailAndPasswordSignIn = async ({ email, password, onGetIdToken }: 
 
 	console.log({ idToken })
 
-	onGetIdToken(idToken)
-
-	console.log('clientAuth.signOut()')
-
 	// A page redirect would suffice as the persistence is set to NONE.
-	return clientAuth.signOut()
+
+	clientAuth.signOut()
+
+	return idToken
 }
