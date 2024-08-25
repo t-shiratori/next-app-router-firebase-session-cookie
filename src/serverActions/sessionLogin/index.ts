@@ -1,5 +1,6 @@
 'use server'
 
+import 'server-only'
 import { admninSdkAuth } from '@/utils/auth/adminSdk'
 import { clog } from '@/utils/log/node'
 import { cookies } from 'next/headers'
