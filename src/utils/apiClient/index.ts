@@ -1,14 +1,16 @@
 type TArgs = {
-	url: string
+	path: string
 	method: 'GET' | 'POST' | 'PUT' | 'DELETE'
 	body?: object
-	idToken?: string
+	headerObject?: Record<string, string>
+	credentials?: RequestCredentials
 }
 
-export const fetcher = async ({ url, method, body, idToken }: TArgs) => {
-	const headers = new Headers()
+export const fetcher = async ({ path, method, body, headerObject, credentials }: TArgs) => {
+	const headers = new Headers(headerObject)
 	headers.append('Content-Type', 'application/json')
-	idToken && headers.append('idToken', idToken)
+
+	const url = `http://localhost:3000${path}`
 
 	try {
 		//throw new Error('TestError')
@@ -17,6 +19,7 @@ export const fetcher = async ({ url, method, body, idToken }: TArgs) => {
 			headers,
 			method,
 			body: JSON.stringify(body),
+			credentials,
 		})
 
 		if (!response.ok) {

@@ -1,73 +1,65 @@
 'use client'
 
-import { useState } from 'react'
-import { emailSignIn } from '../../utils/auth/clientSdk'
 import { useRouter } from 'next/navigation'
-import { fetcher } from '@/utils/apiClient'
 import { sessionLogin } from '@/utils/actions/sessionLogin'
+import { emailAndPasswordSignIn } from '@/utils/auth/emailAndPasswordSignIn'
 
 export const LoginForm = () => {
 	const router = useRouter()
-	const [emailState, setEmailState] = useState('')
-	const [passwordState, setPasswordState] = useState('')
 
-	const handleSubmit = async () => {
-		if (emailState == '') return
-		if (passwordState == '') return
+	const handleSubmit = (formData: FormData) => {
+		const emailValue = formData.get('email')?.toString() ?? ''
+		const passwordValue = formData.get('password')?.toString() ?? ''
 
-		const result = await emailSignIn({
-			email: emailState,
-			password: passwordState,
-			handleAfterSignIn: async (idToken) => {
-				//router.push('/')
-
-				const result = await sessionLogin(idToken)
-				console.log('sessionLogin result: ', result)
-
-				/** For api route execution */
-				// const res = await fetcher({ url: 'http://localhost:3000/api/session-login', method: 'GET', idToken })
-				// console.log('sessionLogin result: ', res)
+		emailAndPasswordSignIn({
+			email: emailValue,
+			password: passwordValue,
+			onGetIdToken: (idToken) => {
+				/** サーバーアクションでセッションログインする場合 */
+				sessionLogin({
+					idToken,
+					redirectPath: '/dashboard',
+				}).catch((error) => {
+					console.log('sessionLogin: ', { error })
+				})
+				/** APIルートでセッションログインする場合 */
+				// fetcher({
+				// 	path: '/api/session-login',
+				// 	method: 'POST',
+				// 	headerObject: { idToken },
+				// })
+				// 	.then(() => {
+				// 		router.push('/dashboard')
+				// 	})
+				// 	.catch((error) => {
+				// 		console.error(error)
+				// 	})
 			},
+		}).catch((error) => {
+			console.log('emailAndPasswordSignIn: ', { error })
 		})
-		console.log({ result })
-		router.push('/')
 	}
 
 	return (
-		<form
-			className="space-3 p-4"
-			onSubmit={(e) => {
-				e.preventDefault()
-			}}>
+		<form className="space-3 p-4" action={handleSubmit}>
 			<input
-				className="border p-2 block"
+				className="border p-2 block w-[240px]"
 				id="email"
 				type="email"
 				name="email"
 				placeholder="Enter your email address"
 				required
-				value={emailState}
-				onChange={(e) => {
-					setEmailState(e.target.value)
-				}}
 			/>
 			<input
-				className="border mt-3 p-2 block"
+				className="border mt-3 p-2 block w-[240px]"
 				id="password"
 				type="password"
 				name="password"
 				placeholder="Enter password"
 				required
-				value={passwordState}
 				minLength={6}
-				onChange={(e) => {
-					setPasswordState(e.target.value)
-				}}
 			/>
-			<button
-				className="mt-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-				type="submit"
-				onClick={handleSubmit}>
+			<button className="mt-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">
 				ログイン
 			</button>
 		</form>

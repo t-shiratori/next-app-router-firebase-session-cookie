@@ -1,5 +1,5 @@
-'use client'
-
+import { GolbalNav } from '@/components/GolbalNav'
+import { Logout } from '@/components/Logout'
 import { ReactNode } from 'react'
 
 type Props = {
@@ -7,6 +7,12 @@ type Props = {
 }
 
 export default function Layout({ children }: Props) {
-	return <div>{children}</div>
+	return (
+		<div>
+			<Logout />
+			<GolbalNav />
+			<div className="m-6">{children}</div>
+		</div>
+	)
 	//return <AuthWrapper>{children}</AuthWrapper>
 }

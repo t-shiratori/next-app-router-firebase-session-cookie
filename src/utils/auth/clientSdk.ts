@@ -1,5 +1,5 @@
-import { initializeApp } from 'firebase/app'
-import { getAuth, signInWithEmailAndPassword, setPersistence, browserLocalPersistence, getIdToken } from 'firebase/auth'
+import { initializeApp, getApps } from 'firebase/app'
+import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth'
 
 const firebaseConfig = {
 	apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,48 +11,23 @@ const firebaseConfig = {
 	measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 }
 
-const app = initializeApp(firebaseConfig)
-const auth = getAuth(app)
+const alreadyCreatedApps = getApps()
 
-console.log('clientSdk app:', { app })
+console.log({ alreadyCreatedApps })
+
+const clientSdkApp = (() => {
+	// すでにアプリが初期化済みならそれを返す
+	if (alreadyCreatedApps.length > 0) {
+		return alreadyCreatedApps[0]
+	}
+	return initializeApp(firebaseConfig)
+})()
+
+export const clientAuth = getAuth(clientSdkApp)
+
+console.log('clientSdk app:', { clientSdkApp })
 
 // As httpOnly cookies are to be used, do not persist any state client side.
 ;(async () => {
-	return await setPersistence(auth, browserLocalPersistence)
+	return await setPersistence(clientAuth, browserLocalPersistence)
 })()
-
-type emailSignInArgs = {
-	email: string
-	password: string
-	handleAfterSignIn: (idToken: string) => void
-}
-
-export const emailSignIn = async ({ email, password, handleAfterSignIn }: emailSignInArgs) => {
-	try {
-		const userCredential = await signInWithEmailAndPassword(auth, email, password).catch((error) => {
-			console.log(error)
-			throw new Error(error)
-		})
-
-		console.log('userCredential?.user: ', userCredential?.user)
-
-		// Get the user's ID token as it is needed to exchange for a session cookie.
-		const idToken = await getIdToken(userCredential.user).catch((error) => {
-			console.log(error)
-			throw new Error(error)
-		})
-		console.log({ idToken })
-
-		handleAfterSignIn(idToken)
-
-		console.log('auth.signOut()')
-		// A page redirect would suffice as the persistence is set to NONE.
-		return auth.signOut()
-	} catch (error) {
-		console.log('emailSignIn error: ', error)
-	}
-}
-
-export const getCurrentUser = () => {
-	return auth.currentUser
-}
