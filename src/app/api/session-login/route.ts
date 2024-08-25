@@ -1,5 +1,6 @@
 import { admninSdkAuth } from '@/utils/auth/adminSdk'
 import { clog } from '@/utils/log/node'
+import { FirebaseAuthError } from 'firebase-admin/auth'
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
 
@@ -16,9 +17,10 @@ export async function POST(request: NextRequest) {
 		}
 
 		/** Check id token is valid */
-		const verifiedIdToken = await admninSdkAuth.verifyIdToken(idToken).catch((error) => {
-			clog.red(error)
-			throw new Error('Invalid id token !')
+		const verifiedIdToken = await admninSdkAuth.verifyIdToken(idToken).catch((error: FirebaseAuthError) => {
+			clog.red('[verifyIdToken error]')
+			console.log({ error })
+			throw error
 		})
 
 		console.log({ verifiedIdToken })
@@ -33,10 +35,13 @@ export async function POST(request: NextRequest) {
 		// The session cookie will have the same claims as the ID token.
 		// To only allow session cookie setting on recent sign-in, auth_time in ID token
 		// can be checked to ensure user was recently signed in before creating a session cookie.
-		const sessionCookie = await admninSdkAuth.createSessionCookie(idToken, { expiresIn }).catch((error) => {
-			clog.red(error)
-			throw new Error('Could not get session cookie.')
-		})
+		const sessionCookie = await admninSdkAuth
+			.createSessionCookie(idToken, { expiresIn })
+			.catch((error: FirebaseAuthError) => {
+				clog.red('[createSessionCookie error]')
+				console.log({ error })
+				throw error
+			})
 
 		console.log({ sessionCookie })
 
@@ -53,13 +58,9 @@ export async function POST(request: NextRequest) {
 			},
 		)
 	} catch (error) {
-		clog.red(error as string)
-
-		const errorMessage = typeof error === 'string' ? error : 'Fail to get session cookie.'
-
 		return Response.json(
 			{
-				message: errorMessage,
+				message: error,
 			},
 			{
 				status: 401,

@@ -13,8 +13,6 @@ export const fetcher = async ({ path, method, body, headerObject, credentials }:
 	const url = `http://localhost:3000${path}`
 
 	try {
-		//throw new Error('TestError')
-
 		const response = await fetch(url, {
 			headers,
 			method,

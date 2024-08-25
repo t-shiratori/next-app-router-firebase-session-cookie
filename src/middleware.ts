@@ -17,6 +17,11 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next()
 	}
 
+	// セッションログイン検証のエンドポイントはスキップ
+	if (request.nextUrl.pathname.startsWith('/api/session-verify')) {
+		return NextResponse.next()
+	}
+
 	const sessionCookie = request.cookies.get('session')?.value
 
 	console.log({ sessionCookie })
@@ -24,7 +29,7 @@ export async function middleware(request: NextRequest) {
 	// セッションクッキーを使って認証済みかどうかチェックする
 	const isAuthenticated = await (async () => {
 		if (!sessionCookie) {
-			clog.red('There is no session in the cookie.')
+			clog.red('[no session in the cookie.]')
 			return false
 		}
 		// Verify the session
@@ -32,22 +37,21 @@ export async function middleware(request: NextRequest) {
 			path: '/api/session-verify',
 			method: 'POST',
 			headerObject: { Cookie: `session=${sessionCookie}` },
-			credentials: 'include',
 		}).catch((error) => {
-			clog.red(`Session verify error: , ${error}`)
+			clog.red('[/api/session-verify fetch error]')
+			console.log({ error })
 			return false
 		})
 	})()
 
 	console.log({ isAuthenticated })
 
-	// If the user is authenticated, continue as normal
 	if (isAuthenticated) {
 		return NextResponse.next()
+	} else {
+		// Redirect to login page if not authenticated
+		return NextResponse.redirect(new URL('/login', request.url))
 	}
-
-	// Redirect to login page if not authenticated
-	return NextResponse.redirect(new URL('/login', request.url))
 }
 
 export const config = {
@@ -61,5 +65,11 @@ export const config = {
 	// 	// ],
 	// 	missing: [{ type: 'cookie', key: 'session', value: 'active' }],
 	// },
-	matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+	matcher: {
+		source: '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+		missing: [
+			// Exclude Server Actions
+			{ type: 'header', key: 'next-action' },
+		],
+	},
 }

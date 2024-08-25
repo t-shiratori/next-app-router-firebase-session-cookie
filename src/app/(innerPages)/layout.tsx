@@ -14,5 +14,4 @@ export default function Layout({ children }: Props) {
 			<div className="m-6">{children}</div>
 		</div>
 	)
-	//return <AuthWrapper>{children}</AuthWrapper>
 }
