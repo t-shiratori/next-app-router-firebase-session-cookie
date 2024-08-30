@@ -16,17 +16,10 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=***
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=***
 NEXT_PUBLIC_FIREBASE_APP_ID=***
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=***
-
-LOGIN_ID=***
-LOGIN_PASSWORD=***
 ```
 
-## Run playwright with ui mode
+## Run dev
 
 ```sh
-pnpm e2e:ui
+pnpm dev
 ```
-
-Click the play button.
-
-<img width="1512" alt="スクリーンショット 2024-07-18 19 37 56" src="https://github.com/user-attachments/assets/aad8d717-7fc1-4b49-9cff-cd5f98ee9577">
