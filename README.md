@@ -32,7 +32,7 @@ Add the json file in .env file.
 GOOGLE_APPLICATION_CREDENTIALS=firebase-adminsdk.json
 ```
 
-## Run dev
+## Run App
 
 ```sh
 pnpm dev
