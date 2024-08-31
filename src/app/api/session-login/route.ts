@@ -1,4 +1,5 @@
 import { admninSdkAuth } from '@/utils/auth/adminSdk'
+import { errorMessage } from '@/utils/errorMessage'
 import { clog } from '@/utils/log/node'
 import { FirebaseAuthError } from 'firebase-admin/auth'
 import { cookies } from 'next/headers'
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
 		const idToken = request.headers.get('idToken') ?? false
 
 		if (!idToken) {
-			throw new Error('Not found id token !')
+			throw Error('Not found id token !')
 		}
 
 		/** Check id token is valid */
@@ -58,13 +59,8 @@ export async function POST(request: NextRequest) {
 			},
 		)
 	} catch (error) {
-		return Response.json(
-			{
-				message: error,
-			},
-			{
-				status: 401,
-			},
-		)
+		return Response.json(errorMessage(error), {
+			status: 401,
+		})
 	}
 }

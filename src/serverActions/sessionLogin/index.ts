@@ -25,11 +25,7 @@ export async function sessionLogin({ idToken, redirectPath }: Args) {
 
 	console.log({ verifiedIdToken })
 
-	// Set session expiration to 5 days.
-	// const expiresIn = 60 * 60 * 24 * 5 * 1000
-
-	// 5 minutes
-	const expiresIn = 60 * 1000 * 5
+	const expiresIn = 60 * 1000 * 10
 
 	// Create the session cookie. This will also verify the ID token in the process.
 	// The session cookie will have the same claims as the ID token.

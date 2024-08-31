@@ -22,6 +22,11 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next()
 	}
 
+	//  カスタムクレイム登録のエンドポイントはスキップ
+	if (request.nextUrl.pathname.startsWith('/api/custom-claims')) {
+		return NextResponse.next()
+	}
+
 	const sessionCookie = request.cookies.get('session')?.value
 
 	console.log({ sessionCookie })
