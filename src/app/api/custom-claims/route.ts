@@ -1,7 +1,7 @@
 import { admninSdkAuth } from '@/utils/auth/adminSdk'
 import { errorMessage } from '@/utils/errorMessage'
 import { clog } from '@/utils/log/node'
-import { FirebaseAuthError, getAuth } from 'firebase-admin/auth'
+import { FirebaseAuthError } from 'firebase-admin/auth'
 import { NextRequest } from 'next/server'
 
 export async function POST(request: NextRequest) {
